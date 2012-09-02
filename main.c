@@ -91,7 +91,7 @@ static int parse_args(int argc, char **argv)
   return 1;
 }
 
-
+#undef main
 int main(int argc, char **argv)
 {
   printf("%s (Build date %s)\n", SMSSDL_TITLE, __DATE__);

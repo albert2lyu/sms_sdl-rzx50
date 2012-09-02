@@ -26,7 +26,7 @@
 #include "unzip.h"
 #endif
 
-
+extern char homedir[512];
 
 #ifdef USE_ZLIB
 
@@ -78,7 +78,7 @@ static int load_rom_zip(const char* filename)
   if(!cart.rom) return 0;
 
   if(unzOpenCurrentFile(zf) != UNZ_OK)
-		return 0;
+        return 0;
 
   // skip header
   if(skip_header)
@@ -152,8 +152,9 @@ int load_rom(const char *filename)
 void load_sram(const char* game_name)
 {
   if(sms.save) {
-    char name[0x100];
+    char name[0x200];
     FILE *fd;
+    sprintf(name, "%s/%s", homedir, game_name);
     strcpy(name, game_name);
     strcpy(strrchr(name, '.'), ".sav");
     fd = fopen(name, "rb");
@@ -169,9 +170,9 @@ void load_sram(const char* game_name)
 void save_sram(const char* game_name)
 {
     if(sms.save) {
-        char name[0x100];
+        char name[0x200];
         FILE *fd = NULL;
-        strcpy(name, game_name);
+        sprintf(name, "%s/%s", homedir, game_name);
         strcpy(strrchr(name, '.'), ".sav");
         fd = fopen(name, "wb");
         if(fd) {
@@ -185,9 +186,9 @@ void save_sram(const char* game_name)
 /* Load system state */
 int load_state(const char* game_name, int state_slot)
 {
-    char name[0x100];
+    char name[0x200];
     FILE *fd = NULL;
-    strcpy(name, game_name);
+    sprintf(name, "%s/%s", homedir, game_name);
     sprintf(strrchr(name, '.'), ".st%d", state_slot);
     fd = fopen(name, "rb");
     if(!fd) return (0);
@@ -200,9 +201,9 @@ int load_state(const char* game_name, int state_slot)
 /* Save system state */
 int save_state(const char* game_name, int state_slot)
 {
-    char name[0x100];
+    char name[0x200];
     FILE *fd = NULL;
-    strcpy(name, game_name);
+    sprintf(name, "%s/%s", homedir, game_name);
     sprintf(strrchr(name, '.'), ".st%d", state_slot);
     fd = fopen(name, "wb");
     if(!fd) return (0);
