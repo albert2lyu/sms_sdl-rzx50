@@ -49,7 +49,6 @@ static const char *rom_filename;
 static int fps = 0;
 static int framecounter = 0;
 static long time1 = 0;
-static t_sdl_sync sdl_sync;
 static t_sdl_video sdl_video;
 static t_sdl_sound sdl_sound;
 static t_sdl_controls sdl_controls;

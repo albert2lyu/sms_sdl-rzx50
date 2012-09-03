@@ -87,12 +87,6 @@ typedef struct {
   int map_b1, map_b2, map_start;
 } t_sdl_joystick;
 
-typedef struct {
-  Uint32 ticks_starting;
-  SDL_sem* sem_sync;
-} t_sdl_sync;
-
-
 extern int sdlsms_init(const t_config*);
 extern void sdlsms_emulate();
 extern void sdlsms_shutdown();
