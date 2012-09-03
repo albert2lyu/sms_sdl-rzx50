@@ -190,8 +190,8 @@ void gfx_font_print(SDL_Surface* dest,int16_t inX, int16_t inY, SDL_Surface* inF
             tempY += (inFont->h >> 4);
             continue;
         }
-        for(j = ((*tempChar >> 4) * (inFont->h >> 4)), y = tempY; (j < (((*tempChar >> 4) + 1) * (inFont->h >> 4))) && (y < 240); j++, y++) {
-            for(i = ((*tempChar & 0x0F) * (inFont->w >> 4)), x = tempX; (i < (((*tempChar & 0x0F) + 1) * (inFont->w >> 4))) && (x < 320); i++, x++) {
+        for(j = ((*tempChar >> 4) * (inFont->h >> 4)), y = tempY; (j < (((*tempChar >> 4) + 1) * (inFont->h >> 4))) && (y < dest->h); j++, y++) {
+            for(i = ((*tempChar & 0x0F) * (inFont->w >> 4)), x = tempX; (i < (((*tempChar & 0x0F) + 1) * (inFont->w >> 4))) && (x < dest->w); i++, x++) {
                 tempBuffer[(y * dest->w) + x] |= tempFont[(j * inFont->w) + i];
             }
         }
@@ -208,7 +208,7 @@ void gfx_font_print_char(SDL_Surface* dest,int16_t inX, int16_t inY, SDL_Surface
 }
 
 void gfx_font_print_center(SDL_Surface* dest,int16_t inY, SDL_Surface* inFont, char* inString) {
-    int16_t tempX = (320 - gfx_font_width(inFont, inString)) >> 1;
+    int16_t tempX = (dest->w - gfx_font_width(inFont, inString)) >> 1;
     gfx_font_print(dest,tempX, inY, inFont, inString);
 }
 
@@ -280,7 +280,6 @@ SDL_Surface* gfx_tex_load_tga_from_array(uint8_t* buffer) {
 
 void menu()
 {
-    SDL_Surface* TmpScreen;
     int pressed = 0;
     int currentselection = 1;
     int miniscreenwidth = 140;
@@ -296,86 +295,84 @@ void menu()
         bitmap_scale(0,0,256,192,miniscreenwidth,miniscreenheight,256,0,(uint16_t*)sdl_video.surf_bitmap->pixels,(uint16_t*)miniscreen->pixels);
     SDL_UnlockSurface(miniscreen);
     char text[50];
-    TmpScreen = SDL_DisplayFormat(sdl_video.surf_screen);
+
     SDL_PollEvent(&Event);
     while (((currentselection != 1) && (currentselection != 7)) || (!pressed))
     {
         pressed = 0;
-        SDL_FillRect( TmpScreen, NULL, 0 );
+        SDL_FillRect( sdl_video.surf_screen, NULL, 0 );
 
-        dstRect.x = 320-5-miniscreenwidth;
+        dstRect.x = sdl_video.surf_screen->w-5-miniscreenwidth;
         dstRect.y = 30;
-        dstRect.h = miniscreenheight;
-        dstRect.w = miniscreenwidth;
-        SDL_BlitSurface(miniscreen,NULL,TmpScreen,&dstRect);
+        SDL_BlitSurface(miniscreen,NULL,sdl_video.surf_screen,&dstRect);
 
-        gfx_font_print_center(TmpScreen,5,bigfontwhite,"DINGUX SMS_SDL");
+        gfx_font_print_center(sdl_video.surf_screen,5,bigfontwhite,"DINGUX SMS_SDL");
 
         if (currentselection == 1)
-            gfx_font_print(TmpScreen,5,25,bigfontred,"Continue");
+            gfx_font_print(sdl_video.surf_screen,5,25,bigfontred,"Continue");
         else
-            gfx_font_print(TmpScreen,5,25,bigfontwhite,"Continue");
+            gfx_font_print(sdl_video.surf_screen,5,25,bigfontwhite,"Continue");
 
 
         sprintf(text,"Volume %d",volume);
 
         if (currentselection == 2)
-            gfx_font_print(TmpScreen,5,45,bigfontred,text);
+            gfx_font_print(sdl_video.surf_screen,5,45,bigfontred,text);
         else
-            gfx_font_print(TmpScreen,5,45,bigfontwhite,text);
+            gfx_font_print(sdl_video.surf_screen,5,45,bigfontwhite,text);
 
         sprintf(text,"Save State %d",sdl_controls.state_slot);
 
         if (currentselection == 3)
-            gfx_font_print(TmpScreen,5,65,bigfontred,text);
+            gfx_font_print(sdl_video.surf_screen,5,65,bigfontred,text);
         else
-            gfx_font_print(TmpScreen,5,65,bigfontwhite,text);
+            gfx_font_print(sdl_video.surf_screen,5,65,bigfontwhite,text);
 
         sprintf(text,"Load State %d",sdl_controls.state_slot);
 
         if (currentselection == 4)
-            gfx_font_print(TmpScreen,5,85,bigfontred,text);
+            gfx_font_print(sdl_video.surf_screen,5,85,bigfontred,text);
         else
-            gfx_font_print(TmpScreen,5,85,bigfontwhite,text);
+            gfx_font_print(sdl_video.surf_screen,5,85,bigfontwhite,text);
 
         if (currentselection == 5)
         {
             if (fullscreen == 1)
-                gfx_font_print(TmpScreen,5,105,bigfontred,"Stretched FS");
+                gfx_font_print(sdl_video.surf_screen,5,105,bigfontred,"Stretched FS");
             else
                 if (fullscreen == 2)
-                    gfx_font_print(TmpScreen,5,105,bigfontred,"Aspect FS");
+                    gfx_font_print(sdl_video.surf_screen,5,105,bigfontred,"Aspect FS");
                 else
-                    gfx_font_print(TmpScreen,5,105,bigfontred,"Native Res");
+                    gfx_font_print(sdl_video.surf_screen,5,105,bigfontred,"Native Res");
         }
         else
         {
             if (fullscreen == 1)
-                gfx_font_print(TmpScreen,5,105,bigfontwhite,"Stretched FS");
+                gfx_font_print(sdl_video.surf_screen,5,105,bigfontwhite,"Stretched FS");
             else
                 if (fullscreen == 2)
-                    gfx_font_print(TmpScreen,5,105,bigfontwhite,"Aspect FS");
+                    gfx_font_print(sdl_video.surf_screen,5,105,bigfontwhite,"Aspect FS");
                 else
-                    gfx_font_print(TmpScreen,5,105,bigfontwhite,"Native Res");
+                    gfx_font_print(sdl_video.surf_screen,5,105,bigfontwhite,"Native Res");
         }
 
         sprintf(text,"%s",showfps ? "Show fps on" : "Show fps off");
 
         if (currentselection == 6)
-            gfx_font_print(TmpScreen,5,125,bigfontred,text);
+            gfx_font_print(sdl_video.surf_screen,5,125,bigfontred,text);
         else
-            gfx_font_print(TmpScreen,5,125,bigfontwhite,text);
+            gfx_font_print(sdl_video.surf_screen,5,125,bigfontwhite,text);
 
 
         if (currentselection == 7)
-            gfx_font_print(TmpScreen,5,145,bigfontred,"Quit");
+            gfx_font_print(sdl_video.surf_screen,5,145,bigfontred,"Quit");
         else
-            gfx_font_print(TmpScreen,5,145,bigfontwhite,"Quit");
+            gfx_font_print(sdl_video.surf_screen,5,145,bigfontwhite,"Quit");
 
-        gfx_font_print_center(TmpScreen,240-40-gfx_font_height(font),font,"Dingux sms_sdl has been ported by joyrider");
-        gfx_font_print_center(TmpScreen,240-30-gfx_font_height(font),font,"Thanks to alekmaul for the scaler example,");
-        gfx_font_print_center(TmpScreen,240-20-gfx_font_height(font),font,"Harteex for the tga loading and bin2h,");
-        gfx_font_print_center(TmpScreen,240-10-gfx_font_height(font),font,"everyone on #dingoo-a320 and #dingoonity!");
+        gfx_font_print_center(sdl_video.surf_screen,sdl_video.surf_screen->h-40-gfx_font_height(font),font,"Dingux sms_sdl has been ported by joyrider");
+        gfx_font_print_center(sdl_video.surf_screen,sdl_video.surf_screen->h-30-gfx_font_height(font),font,"Thanks to alekmaul for the scaler example,");
+        gfx_font_print_center(sdl_video.surf_screen,sdl_video.surf_screen->h-20-gfx_font_height(font),font,"Harteex for the tga loading and bin2h,");
+        gfx_font_print_center(sdl_video.surf_screen,sdl_video.surf_screen->h-10-gfx_font_height(font),font,"everyone on #dingoo-a320 and #dingoonity!");
 
         while (SDL_PollEvent(&Event))
         {
@@ -495,7 +492,7 @@ void menu()
                     break;
             }
         }
-    SDL_BlitSurface(TmpScreen,NULL,sdl_video.surf_screen,NULL);
+
     SDL_Flip(sdl_video.surf_screen);
     SDL_Delay(4);
 
@@ -628,7 +625,24 @@ static int sdlsms_video_init(int frameskip, int afullscreen, int filter)
     }
 */
 
-    sdl_video.surf_screen = SDL_SetVideoMode(320, 240, 16, vidflags);
+    //sdl_video.surf_screen = SDL_SetVideoMode(320, 240, 16, vidflags);
+    {
+        int i = 0; // 0 - 320x240, 1 - 400x240, 2 - 480x272
+        int surfacewidth, surfaceheight;
+        #define NUMOFVIDEOMODES 3
+        struct { int x; int y; } vm[NUMOFVIDEOMODES] = { {320, 240}, {400, 240}, {480, 272} };
+
+        // check 3 videomodes: 480x272, 400x240, 320x240
+        for(i = NUMOFVIDEOMODES-1; i >= 0; i--) {
+            if(SDL_VideoModeOK(vm[i].x, vm[i].y, 16, vidflags) != 0) {
+                surfacewidth = vm[i].x;
+                surfaceheight = vm[i].y;
+                break;
+            }
+        }
+        sdl_video.surf_screen = SDL_SetVideoMode(surfacewidth, surfaceheight, 16, vidflags);
+    }
+
     if(!sdl_video.surf_screen) {
         printf("ERROR: can't set video mode (%dx%d): %s.\n", 320, 240, SDL_GetError());
         return 0;
@@ -708,22 +722,45 @@ static void sdlsms_video_finish_update()
         //sdlsms_video_blit_center(sdl_video.surf_screen, sdl_video.surf_bitmap);
         SDL_LockSurface(sdl_video.surf_screen);
         SDL_LockSurface(sdl_video.surf_bitmap);
-        if (fullscreen == 1) {
-            if(IS_GG)
-                bitmap_scale(48,24,160,144,320,240,256,0,(uint16_t*)sdl_video.surf_bitmap->pixels,(uint16_t*)sdl_video.surf_screen->pixels);
-            else
-                bitmap_scale(0,0,256,192,320,240,256,0,(uint16_t*)sdl_video.surf_bitmap->pixels,(uint16_t*)sdl_video.surf_screen->pixels);
-        } else if (fullscreen == 2) {
-            if(IS_GG)
-                bitmap_scale(48,24,160,144,267,240,256,53,(uint16_t*)sdl_video.surf_bitmap->pixels,(uint16_t*)sdl_video.surf_screen->pixels+25);
-            else
-                bitmap_scale(0,0,256,192,304,240,256,16,(uint16_t*)sdl_video.surf_bitmap->pixels,(uint16_t*)sdl_video.surf_screen->pixels+8);
-        } else {
-            if(IS_GG)
-                bitmap_scale(48,24,160,144,160,144,256,160,(uint16_t*)sdl_video.surf_bitmap->pixels,(uint16_t*)sdl_video.surf_screen->pixels+15440);
-            else
-                bitmap_scale(0,0,256,192,256,192,256,64,(uint16_t*)sdl_video.surf_bitmap->pixels,(uint16_t*)sdl_video.surf_screen->pixels+7680+32);
+        switch(fullscreen) {
+        case 1: // normal fullscreen
+            switch(sdl_video.surf_screen->w) {
+            case 480:
+                if(IS_GG) bitmap_scale(48,24,160,144,480,272,256,0,(uint16_t*)sdl_video.surf_bitmap->pixels,(uint16_t*)sdl_video.surf_screen->pixels);
+                else bitmap_scale(8,0,256-8,192,480,272,256,0,(uint16_t*)sdl_video.surf_bitmap->pixels,(uint16_t*)sdl_video.surf_screen->pixels);
+                break;
+            case 400:
+                if(IS_GG) bitmap_scale(48,24,160,144,400,240,256,0,(uint16_t*)sdl_video.surf_bitmap->pixels,(uint16_t*)sdl_video.surf_screen->pixels);
+                else bitmap_scale(8,0,256-8,192,400,240,256,0,(uint16_t*)sdl_video.surf_bitmap->pixels,(uint16_t*)sdl_video.surf_screen->pixels);
+                break;
+            case 320:
+                if(IS_GG) bitmap_scale(48,24,160,144,320,240,256,0,(uint16_t*)sdl_video.surf_bitmap->pixels,(uint16_t*)sdl_video.surf_screen->pixels);
+                else bitmap_scale(8,0,256-8,192,320,240,256,0,(uint16_t*)sdl_video.surf_bitmap->pixels,(uint16_t*)sdl_video.surf_screen->pixels);
+                break;
+            }
+            break;
+        case 2: // aspect ratio
+            switch(sdl_video.surf_screen->w) {
+            case 480:
+                if(IS_GG) bitmap_scale(48,24,160,144,320,272,256,480-320,(uint16_t*)sdl_video.surf_bitmap->pixels,(uint16_t*)sdl_video.surf_screen->pixels+(480-320)/2);
+                else bitmap_scale(8,0,256-8,192,360,272,256,480-360,(uint16_t*)sdl_video.surf_bitmap->pixels,(uint16_t*)sdl_video.surf_screen->pixels+(480-360)/2);
+                break;
+            case 400:
+                if(IS_GG) bitmap_scale(48,24,160,144,320,240,256,400-320,(uint16_t*)sdl_video.surf_bitmap->pixels,(uint16_t*)sdl_video.surf_screen->pixels+(400-320)/2);
+                else bitmap_scale(8,0,256-8,192,360,272,256,400-360,(uint16_t*)sdl_video.surf_bitmap->pixels,(uint16_t*)sdl_video.surf_screen->pixels+(400-360)/2);
+                break;
+            case 320:
+                if(IS_GG) bitmap_scale(48,24,160,144,320,240,256,0,(uint16_t*)sdl_video.surf_bitmap->pixels,(uint16_t*)sdl_video.surf_screen->pixels);
+                else bitmap_scale(8,0,256-8,192,320,240,256,0,(uint16_t*)sdl_video.surf_bitmap->pixels,(uint16_t*)sdl_video.surf_screen->pixels);
+                break;
+            }
+            break;
+        default: // native res
+            if(IS_GG) bitmap_scale(48,24,160,144,160,144,256,sdl_video.surf_screen->w-160,(uint16_t*)sdl_video.surf_bitmap->pixels,(uint16_t*)sdl_video.surf_screen->pixels+(sdl_video.surf_screen->w-160)/2+(sdl_video.surf_screen->h-144)/2*sdl_video.surf_screen->w);
+            else bitmap_scale(0,0,256,192,256,192,256,sdl_video.surf_screen->w-256,(uint16_t*)sdl_video.surf_bitmap->pixels,(uint16_t*)sdl_video.surf_screen->pixels+(sdl_video.surf_screen->w-256)/2+(sdl_video.surf_screen->h-192)/2*sdl_video.surf_screen->w);
+            break;
         }
+
         SDL_UnlockSurface(sdl_video.surf_bitmap);
         SDL_UnlockSurface(sdl_video.surf_screen);
         SDL_Flip(sdl_video.surf_screen);
@@ -1178,6 +1215,7 @@ void sdlsms_emulate()
 
         if(selectpressed && startpressed) {
             menu();
+            SDL_FillRect(sdl_video.surf_screen, NULL, 0);
             input.system &= (IS_GG) ? ~INPUT_START : ~INPUT_PAUSE;
             selectpressed = 0;
             startpressed = 0;
