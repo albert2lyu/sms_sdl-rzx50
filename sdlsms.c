@@ -508,7 +508,7 @@ void menu()
 
 }
 
-
+#if 0
 static void sdlsms_video_blit_center(SDL_Surface* screen, SDL_Surface* buffer)
 {
     /* center the bitmap in the screen only if necessary */
@@ -539,7 +539,7 @@ static void sdlsms_video_blit_center(SDL_Surface* screen, SDL_Surface* buffer)
     else
         SDL_BlitSurface(buffer, NULL, screen, NULL);
 }
-
+#endif
 static void sdlsms_video_take_screenshot()
 {
     int status;
