@@ -35,4 +35,4 @@ $(NAME): $(OBJECTS)
 	$(CC) -c $(CFLAGS) $(INCLUDES) $(DEFINES) $< -o $@
 
 clean:
-	rm -f $(OBJECTS) $(NAME)
+	rm -f $(OBJECTS) bin/$(NAME)
