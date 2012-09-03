@@ -28,7 +28,7 @@
 #include "SDL/SDL_thread.h"
 #include "shared.h"
 #include "saves.h"
-#include "filters.h"
+//#include "filters.h"
 #include "sdlsms.h"
 #include "bigfontwhite.h"
 #include "bigfontred.h"
@@ -54,6 +54,7 @@ static t_sdl_video sdl_video;
 static t_sdl_sound sdl_sound;
 static t_sdl_controls sdl_controls;
 static t_sdl_joystick sdl_joystick;
+/*
 static t_filterfunc filters[FILTER_NUM] = {
   filter_2xsai,
   filter_super2xsai,
@@ -64,6 +65,7 @@ static t_filterfunc filters[FILTER_NUM] = {
   filter_bilinear,
   filter_dotmatrix
 };
+*/
 char homedir[512];
 char configname[512];
 
@@ -877,6 +879,7 @@ static int sdlsms_controls_update(SDLKey k, int p)
             case SDLK_7:
             case SDLK_8:
                 /* only 'hot change' if started with a filter */
+/*
                 if(sdl_video.current_filter != -1) {
                     int cur = k - SDLK_1;
                     if(cur >= 0 && cur < FILTER_NUM) {
@@ -885,6 +888,7 @@ static int sdlsms_controls_update(SDLKey k, int p)
                     }
                 }
                 break;
+*/
             case DINGOO_BUTTON_Y:
                 sdlsms_video_take_screenshot();
                 break;

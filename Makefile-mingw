@@ -16,7 +16,7 @@ DEFINES   = -DLSB_FIRST -DALIGN_DWORD
 INCLUDES  = -I. -Ibase -Icpu -Isound
 LIBS	  = -s -lSDL -lSDLmain -lz
 
-OBJECTS   = main.o saves.o sdlsms.o filters.o \
+OBJECTS   = main.o saves.o sdlsms.o \
             base/render.o base/sms.o base/system.o base/vdp.o \
             cpu/z80.o sound/emu2413.o sound/sn76496.o
 
