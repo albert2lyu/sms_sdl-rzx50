@@ -564,12 +564,16 @@ static void homedir_init()
     char *home = getenv("HOME");
     if(home) sprintf(homedir, "%s/.smsgg", home);
     mkdir(homedir, 0777);
+    memset(configname, 0, 512);
+    sprintf(configname, "%s/smsgg.cfg", homedir);
 
     if(errno != EROFS && errno != EACCES && errno != EPERM) return;
     memset(homedir, 0, 512);
     getcwd(homedir, 512);
     strcat(homedir, "/.smsgg");
     mkdir(homedir, 0777);
+    memset(configname, 0, 512);
+    sprintf(configname, "%s/smsgg.cfg", homedir);
 #endif
 }
 
@@ -871,7 +875,7 @@ static void sdlsms_sound_update()
 
     SDL_LockMutex(sound_mutex);
     for(i = 0; i < snd.bufsize; ++i) {
-        while(sdl_sound.current_emulated_samples > SOUND_SAMPLES_SIZE) SDL_CondWait(sound_cv, sound_mutex);
+        while(sdl_sound.current_emulated_samples > SOUND_SAMPLES_SIZE*2) SDL_CondWait(sound_cv, sound_mutex);
         *(short *)sdl_sound.current_pos = snd.buffer[0][i]; sdl_sound.current_pos += 2;
         *(short *)sdl_sound.current_pos = snd.buffer[1][i]; sdl_sound.current_pos += 2;
         sdl_sound.current_emulated_samples += 1;
