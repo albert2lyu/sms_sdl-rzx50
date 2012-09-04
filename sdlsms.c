@@ -564,14 +564,12 @@ static void homedir_init()
     char *home = getenv("HOME");
     if(home) sprintf(homedir, "%s/.smsgg", home);
     mkdir(homedir, 0777);
-    memset(configname, 0, 512);
-    sprintf(configname, "%s/smsgg.cfg", homedir);
 
-    if(errno != EROFS && errno != EACCES && errno != EPERM) return;
-    memset(homedir, 0, 512);
-    getcwd(homedir, 512);
-    strcat(homedir, "/.smsgg");
-    mkdir(homedir, 0777);
+    if(errno == EROFS || errno == EACCES || errno == EPERM) {
+        getcwd(homedir, 512);
+        strcat(homedir, "/.smsgg");
+        mkdir(homedir, 0777);
+    }
     memset(configname, 0, 512);
     sprintf(configname, "%s/smsgg.cfg", homedir);
 #endif

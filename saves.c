@@ -182,13 +182,21 @@ void save_sram(const char* game_name)
     }
 }
 
+#ifdef WIN32
+#define SLASH '\\'
+#else
+#define SLASH '/'
+#endif
+
 
 /* Load system state */
 int load_state(const char* game_name, int state_slot)
 {
     char name[0x200];
+    char *rom_name;
     FILE *fd = NULL;
-    sprintf(name, "%s/%s", homedir, game_name);
+    if((rom_name = strrchr(game_name, SLASH)) == NULL) rom_name = (char*)game_name;
+    sprintf(name, "%s/%s", homedir, rom_name);
     sprintf(strrchr(name, '.'), ".st%d", state_slot);
     fd = fopen(name, "rb");
     if(!fd) return (0);
@@ -202,8 +210,10 @@ int load_state(const char* game_name, int state_slot)
 int save_state(const char* game_name, int state_slot)
 {
     char name[0x200];
+    char *rom_name;
     FILE *fd = NULL;
-    sprintf(name, "%s/%s", homedir, game_name);
+    if((rom_name = strrchr(game_name, SLASH)) == NULL) rom_name = (char*)game_name;
+    sprintf(name, "%s/%s", homedir, rom_name);
     sprintf(strrchr(name, '.'), ".st%d", state_slot);
     fd = fopen(name, "wb");
     if(!fd) return (0);
