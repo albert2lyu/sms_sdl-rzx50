@@ -730,38 +730,52 @@ static void sdlsms_video_finish_update()
         case 1: // normal fullscreen
             switch(sdl_video.surf_screen->w) {
             case 480:
-                if(IS_GG) bitmap_scale(48,24,160,144,480,272,256,0,(uint16_t*)sdl_video.surf_bitmap->pixels,(uint16_t*)sdl_video.surf_screen->pixels);
-                else bitmap_scale(8,0,256-8,192,480,272,256,0,(uint16_t*)sdl_video.surf_bitmap->pixels,(uint16_t*)sdl_video.surf_screen->pixels);
+                if(IS_GG) 
+                    upscale_160x144_to_480x272((uint32_t*)sdl_video.surf_screen->pixels, (uint32_t*)sdl_video.surf_bitmap->pixels+((24*256)+48)/2);
+                else 
+                    upscale_256x192_to_480x272((uint32_t*)sdl_video.surf_screen->pixels, (uint32_t*)sdl_video.surf_bitmap->pixels);
                 break;
             case 400:
-                if(IS_GG) bitmap_scale(48,24,160,144,400,240,256,0,(uint16_t*)sdl_video.surf_bitmap->pixels,(uint16_t*)sdl_video.surf_screen->pixels);
-                else bitmap_scale(8,0,256-8,192,400,240,256,0,(uint16_t*)sdl_video.surf_bitmap->pixels,(uint16_t*)sdl_video.surf_screen->pixels);
+                if(IS_GG) 
+                    upscale_160x144_to_400x240((uint32_t*)sdl_video.surf_screen->pixels, (uint32_t*)sdl_video.surf_bitmap->pixels+((24*256)+48)/2);
+                else 
+                    upscale_256x192_to_400x240((uint32_t*)sdl_video.surf_screen->pixels, (uint32_t*)sdl_video.surf_bitmap->pixels);
                 break;
             case 320:
-                if(IS_GG) bitmap_scale(48,24,160,144,320,240,256,0,(uint16_t*)sdl_video.surf_bitmap->pixels,(uint16_t*)sdl_video.surf_screen->pixels);
-                else bitmap_scale(8,0,256-8,192,320,240,256,0,(uint16_t*)sdl_video.surf_bitmap->pixels,(uint16_t*)sdl_video.surf_screen->pixels);
+                if(IS_GG) 
+                    upscale_160x144_to_320x240((uint32_t*)sdl_video.surf_screen->pixels, (uint32_t*)sdl_video.surf_bitmap->pixels+((24*256)+48)/2);
+                else 
+                    upscale_256x192_to_320x240((uint32_t*)sdl_video.surf_screen->pixels, (uint32_t*)sdl_video.surf_bitmap->pixels);
                 break;
             }
             break;
         case 2: // aspect ratio
             switch(sdl_video.surf_screen->w) {
             case 480:
-                if(IS_GG) bitmap_scale(48,24,160,144,320,272,256,480-320,(uint16_t*)sdl_video.surf_bitmap->pixels,(uint16_t*)sdl_video.surf_screen->pixels+(480-320)/2);
-                else bitmap_scale(8,0,256-8,192,360,272,256,480-360,(uint16_t*)sdl_video.surf_bitmap->pixels,(uint16_t*)sdl_video.surf_screen->pixels+(480-360)/2);
+                if(IS_GG) 
+                    upscale_160x144_to_320x272_for_480x272((uint32_t*)sdl_video.surf_screen->pixels, (uint32_t*)sdl_video.surf_bitmap->pixels+((24*256)+48)/2);
+                else 
+                    upscale_256x192_to_384x272_for_480x272((uint32_t*)sdl_video.surf_screen->pixels, (uint32_t*)sdl_video.surf_bitmap->pixels);
                 break;
             case 400:
-                if(IS_GG) bitmap_scale(48,24,160,144,320,240,256,400-320,(uint16_t*)sdl_video.surf_bitmap->pixels,(uint16_t*)sdl_video.surf_screen->pixels+(400-320)/2);
-                else bitmap_scale(8,0,256-8,192,360,272,256,400-360,(uint16_t*)sdl_video.surf_bitmap->pixels,(uint16_t*)sdl_video.surf_screen->pixels+(400-360)/2);
+                if(IS_GG) 
+                    upscale_160x144_to_320x240_for_400x240((uint32_t*)sdl_video.surf_screen->pixels, (uint32_t*)sdl_video.surf_bitmap->pixels+((24*256)+48)/2);
+                else 
+                    upscale_256x192_to_304x240_for_400x240((uint32_t*)sdl_video.surf_screen->pixels, (uint32_t*)sdl_video.surf_bitmap->pixels);
                 break;
             case 320:
-                if(IS_GG) bitmap_scale(48,24,160,144,320,240,256,0,(uint16_t*)sdl_video.surf_bitmap->pixels,(uint16_t*)sdl_video.surf_screen->pixels);
-                else bitmap_scale(8,0,256-8,192,320,240,256,0,(uint16_t*)sdl_video.surf_bitmap->pixels,(uint16_t*)sdl_video.surf_screen->pixels);
+                if(IS_GG) 
+                    upscale_160x144_to_320x240((uint32_t*)sdl_video.surf_screen->pixels, (uint32_t*)sdl_video.surf_bitmap->pixels+((24*256)+48)/2);
+                else 
+                    upscale_256x192_to_320x240((uint32_t*)sdl_video.surf_screen->pixels, (uint32_t*)sdl_video.surf_bitmap->pixels);
                 break;
             }
             break;
         default: // native res
-            if(IS_GG) bitmap_scale(48,24,160,144,160,144,256,sdl_video.surf_screen->w-160,(uint16_t*)sdl_video.surf_bitmap->pixels,(uint16_t*)sdl_video.surf_screen->pixels+(sdl_video.surf_screen->w-160)/2+(sdl_video.surf_screen->h-144)/2*sdl_video.surf_screen->w);
-            else bitmap_scale(0,0,256,192,256,192,256,sdl_video.surf_screen->w-256,(uint16_t*)sdl_video.surf_bitmap->pixels,(uint16_t*)sdl_video.surf_screen->pixels+(sdl_video.surf_screen->w-256)/2+(sdl_video.surf_screen->h-192)/2*sdl_video.surf_screen->w);
+            if(IS_GG) 
+                bitmap_scale(48,24,160,144,160,144,256,sdl_video.surf_screen->w-160,(uint16_t*)sdl_video.surf_bitmap->pixels,(uint16_t*)sdl_video.surf_screen->pixels+(sdl_video.surf_screen->w-160)/2+(sdl_video.surf_screen->h-144)/2*sdl_video.surf_screen->w);
+            else 
+                bitmap_scale(0,0,256,192,256,192,256,sdl_video.surf_screen->w-256,(uint16_t*)sdl_video.surf_bitmap->pixels,(uint16_t*)sdl_video.surf_screen->pixels+(sdl_video.surf_screen->w-256)/2+(sdl_video.surf_screen->h-192)/2*sdl_video.surf_screen->w);
             break;
         }
 
