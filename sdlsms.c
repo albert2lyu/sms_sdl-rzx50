@@ -704,25 +704,6 @@ static void sdlsms_video_finish_update()
         sdlsms_video_blit_center(sdl_video.surf_screen, sdl_video.surf_filter);
     }
     else { */
-        if(showfps) {
-            sprintf(buf,"%d fps",fps);
-            dest.x = 0;
-            dest.y = 0;
-            dest.w = gfx_font_width(font,buf);
-            dest.h = gfx_font_height(font);
-
-            if(IS_GG)
-                gfx_font_print(sdl_video.surf_bitmap,52,28,font,buf);
-            else
-                gfx_font_print(sdl_video.surf_bitmap,23,4,font,buf);
-            framecounter++;
-            if (SDL_GetTicks() - time1 > 1000)
-            {
-                fps=framecounter;
-                framecounter=0;
-                time1 = SDL_GetTicks();
-            }
-        }
         //sdlsms_video_blit_center(sdl_video.surf_screen, sdl_video.surf_bitmap);
         SDL_LockSurface(sdl_video.surf_screen);
         SDL_LockSurface(sdl_video.surf_bitmap);
@@ -781,6 +762,23 @@ static void sdlsms_video_finish_update()
 
         SDL_UnlockSurface(sdl_video.surf_bitmap);
         SDL_UnlockSurface(sdl_video.surf_screen);
+        if(showfps) {
+            sprintf(buf,"%d fps",fps);
+            dest.x = 8;
+            dest.y = 8;
+            dest.w = 36;
+            dest.h = 8;
+            SDL_FillRect(sdl_video.surf_screen, &dest, 0);
+
+            gfx_font_print(sdl_video.surf_screen, 8, 8, font, buf);
+            framecounter++;
+            if (SDL_GetTicks() - time1 > 1000)
+            {
+                fps=framecounter;
+                framecounter=0;
+                time1 = SDL_GetTicks();
+            }
+        }
         SDL_Flip(sdl_video.surf_screen);
     //}
 }
