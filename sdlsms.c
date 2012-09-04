@@ -65,6 +65,13 @@ static t_filterfunc filters[FILTER_NUM] = {
   filter_dotmatrix
 };
 */
+
+#ifdef WIN32
+#define SLASH '\\'
+#else
+#define SLASH '/'
+#endif
+
 char homedir[512];
 char configname[512];
 
@@ -541,8 +548,10 @@ static void sdlsms_video_take_screenshot()
 {
     int status;
     char ssname[0x200];
+    char *rom_name;
 
-    sprintf(ssname, "%s/%s", homedir, rom_filename);
+    if((rom_name = strrchr(rom_filename, SLASH)) == NULL) rom_name = (char*)rom_filename;
+    sprintf(ssname, "%s/%s", homedir, rom_name);
     sprintf(strrchr(ssname, '.'), "-%03d.bmp", sdl_video.current_screenshot);
     ++sdl_video.current_screenshot;
     SDL_LockSurface(sdl_video.surf_screen);
@@ -712,13 +721,13 @@ static void sdlsms_video_finish_update()
                 if(IS_GG) 
                     upscale_160x144_to_480x272((uint32_t*)sdl_video.surf_screen->pixels, (uint32_t*)sdl_video.surf_bitmap->pixels+((24*256)+48)/2);
                 else 
-                    upscale_256x192_to_480x272((uint32_t*)sdl_video.surf_screen->pixels, (uint32_t*)sdl_video.surf_bitmap->pixels);
+                    upscale_256x192_to_384x272_for_480x272((uint32_t*)sdl_video.surf_screen->pixels, (uint32_t*)sdl_video.surf_bitmap->pixels);
                 break;
             case 400:
                 if(IS_GG) 
                     upscale_160x144_to_400x240((uint32_t*)sdl_video.surf_screen->pixels, (uint32_t*)sdl_video.surf_bitmap->pixels+((24*256)+48)/2);
                 else 
-                    upscale_256x192_to_400x240((uint32_t*)sdl_video.surf_screen->pixels, (uint32_t*)sdl_video.surf_bitmap->pixels);
+                    upscale_256x192_to_384x240_for_400x240((uint32_t*)sdl_video.surf_screen->pixels, (uint32_t*)sdl_video.surf_bitmap->pixels);
                 break;
             case 320:
                 if(IS_GG) 
@@ -740,7 +749,7 @@ static void sdlsms_video_finish_update()
                 if(IS_GG) 
                     upscale_160x144_to_320x240_for_400x240((uint32_t*)sdl_video.surf_screen->pixels, (uint32_t*)sdl_video.surf_bitmap->pixels+((24*256)+48)/2);
                 else 
-                    upscale_256x192_to_304x240_for_400x240((uint32_t*)sdl_video.surf_screen->pixels, (uint32_t*)sdl_video.surf_bitmap->pixels);
+                    upscale_256x192_to_384x240_for_400x240((uint32_t*)sdl_video.surf_screen->pixels, (uint32_t*)sdl_video.surf_bitmap->pixels);
                 break;
             case 320:
                 if(IS_GG) 

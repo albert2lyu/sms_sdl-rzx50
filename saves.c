@@ -26,6 +26,12 @@
 #include "unzip.h"
 #endif
 
+#ifdef WIN32
+#define SLASH '\\'
+#else
+#define SLASH '/'
+#endif
+
 extern char homedir[512];
 
 #ifdef USE_ZLIB
@@ -153,8 +159,10 @@ void load_sram(const char* game_name)
 {
   if(sms.save) {
     char name[0x200];
+    char *sram_name;
     FILE *fd;
-    sprintf(name, "%s/%s", homedir, game_name);
+    if((sram_name = strrchr(game_name, SLASH)) == NULL) sram_name = (char*)game_name;
+    sprintf(name, "%s/%s", homedir, sram_name);
     strcpy(name, game_name);
     strcpy(strrchr(name, '.'), ".sav");
     fd = fopen(name, "rb");
@@ -171,8 +179,10 @@ void save_sram(const char* game_name)
 {
     if(sms.save) {
         char name[0x200];
+        char *sram_name;
         FILE *fd = NULL;
-        sprintf(name, "%s/%s", homedir, game_name);
+        if((sram_name = strrchr(game_name, SLASH)) == NULL) sram_name = (char*)game_name;
+        sprintf(name, "%s/%s", homedir, sram_name);
         strcpy(strrchr(name, '.'), ".sav");
         fd = fopen(name, "wb");
         if(fd) {
@@ -181,13 +191,6 @@ void save_sram(const char* game_name)
         }
     }
 }
-
-#ifdef WIN32
-#define SLASH '\\'
-#else
-#define SLASH '/'
-#endif
-
 
 /* Load system state */
 int load_state(const char* game_name, int state_slot)

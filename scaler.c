@@ -372,6 +372,67 @@ void upscale_256x192_to_320x240(uint32_t *dst, uint32_t *src)
 }
 
 /*
+    Upscale 256x192 -> 384x240 (for 400x240)
+
+    Horizontal interpolation
+        384/256=1.5
+        4p -> 6p
+        2dw -> 3dw
+
+        for each line: 4 pixels => 6 pixels (*1.5) (64 blocks)
+        [ab][cd] => [a(ab)][bc][(cd)d]
+
+    Vertical upscale:
+        Bresenham algo with simple interpolation
+
+    Parameters:
+        uint32_t *dst - pointer to 400x240x16bpp buffer
+        uint32_t *src - pointer to 256x192x16bpp buffer
+        pitch correction is made
+*/
+
+void upscale_256x192_to_384x240_for_400x240(uint32_t *dst, uint32_t *src)
+{
+    int midh = 240 / 2;
+    int Eh = 0;
+    int source = 0;
+    int dh = 0;
+    int y, x;
+
+    dst += (400 - 384) / 4;
+
+    for (y = 0; y < 240; y++)
+    {
+        source = dh * 256 / 2;
+
+        for (x = 0; x < 384/6; x++)
+        {
+            register uint32_t ab, cd;
+
+            __builtin_prefetch(dst + 4, 1);
+            __builtin_prefetch(src + source + 4, 0);
+
+            ab = src[source] & 0xF7DEF7DE;
+            cd = src[source + 1] & 0xF7DEF7DE;
+
+            if(Eh >= midh) {
+                ab = AVERAGE(ab, src[source + 256/2]) & 0xF7DEF7DE; // to prevent overflow
+                cd = AVERAGE(cd, src[source + 256/2 + 1]) & 0xF7DEF7DE; // to prevent overflow
+            }
+
+            *dst++ = (ab & 0xFFFF) + AVERAGEHI(ab);
+            *dst++ = (ab >> 16) + ((cd & 0xFFFF) << 16);
+            *dst++ = (cd & 0xFFFF0000) + AVERAGELO(cd);
+
+            source += 2;
+
+        }
+        dst += (400 - 384) / 2; 
+        Eh += 192; if(Eh >= 240) { Eh -= 240; dh++; }
+    }
+}
+
+/*
     Upscale 256x192 -> 384x272 (for 480x240)
 
     Horizontal interpolation
@@ -431,7 +492,7 @@ void upscale_256x192_to_384x272_for_480x272(uint32_t *dst, uint32_t *src)
         Eh += 192; if(Eh >= 272) { Eh -= 272; dh++; }
     }
 }
-
+#if 0
 /* Bresenham's upscale routine - SLOW!!! */
 void UpscaleBresenham(uint16_t *dst, 
                       uint32_t dst_pitch,
@@ -498,3 +559,4 @@ void upscale_256x192_to_304x240_for_400x240(uint32_t *dst, uint32_t *src)
     // left 8 pixels are not shown, so clip them
     UpscaleBresenham((uint16_t *)dst + (400-304)/2, 400*2, 304, 240, (uint16_t *)src+8, 256*2, 256-8, 192);
 }
+#endif
