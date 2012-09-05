@@ -721,7 +721,7 @@ static void sdlsms_video_finish_update()
                 if(IS_GG) 
                     upscale_160x144_to_480x272((uint32_t*)sdl_video.surf_screen->pixels, (uint32_t*)sdl_video.surf_bitmap->pixels+((24*256)+48)/2);
                 else 
-                    upscale_256x192_to_384x272_for_480x272((uint32_t*)sdl_video.surf_screen->pixels, (uint32_t*)sdl_video.surf_bitmap->pixels);
+                    upscale_256x192_to_480x272((uint32_t*)sdl_video.surf_screen->pixels, (uint32_t*)sdl_video.surf_bitmap->pixels);
                 break;
             case 400:
                 if(IS_GG) 

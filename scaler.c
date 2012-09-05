@@ -492,6 +492,105 @@ void upscale_256x192_to_384x272_for_480x272(uint32_t *dst, uint32_t *src)
         Eh += 192; if(Eh >= 272) { Eh -= 272; dh++; }
     }
 }
+/*
+    Upscale 256x192 -> 480x272
+
+    Horizontal interpolation
+        480/256=1.875
+        16p -> 30p
+        8dw -> 15dw
+
+        For each line 16 pixels => 30 pixels (*1.875) (32 blocks)
+        Coarse:
+            [ab][cd][ef][gh][ij][kl][mn][op]
+                =>
+            [aa][bb][cc][d(de)][ef][fg][gh][hi][ij][jk][kl][(lm)m][nn][oo][pp]
+        Fine:
+            ab` = a, (0.875a + 0.125b)
+            cd` = b, (0.75b  + 0.25c)
+            ef` = c, (0.625c + 0.375d)
+            gh` = d, (0.5d   + 0.5e)
+            ij` = e, (0.375e + 0.625f)
+            kl` = f, (0.25f  + 0.75g)
+            mn` = g, (0.125g + 0.875h)
+            op` = h, i
+            qr` = (0.875i + 0.125j), j
+            st` = (0.75j  + 0.25k),  k
+            uv` = (0.625k + 0.375l), l
+            wx` = (0.5l   + 0.5m),   m
+            yz` = (0.375m + 0.625n), n
+            12` = (0.25n  + 0.75o),  o
+            34` = (0.125o + 0.875p), p
+
+    Vertical upscale:
+        Bresenham algo with simple interpolation
+
+    Parameters:
+        uint32_t *dst - pointer to 480x272x16bpp buffer
+        uint32_t *src - pointer to 256x192x16bpp buffer
+*/
+
+void upscale_256x192_to_480x272(uint32_t *dst, uint32_t *src)
+{
+    int midh = 272 / 2;
+    int Eh = 0;
+    int source = 0;
+    int dh = 0;
+    int y, x;
+
+    for (y = 0; y < 272; y++)
+    {
+        source = dh * 256 / 2;
+
+        for (x = 0; x < 480/30; x++)
+        {
+            register uint32_t ab, cd, ef, gh, ij, kl, mn, op;
+
+            __builtin_prefetch(dst + 4, 1);
+            __builtin_prefetch(src + source + 4, 0);
+
+            ab = src[source] & 0xF7DEF7DE;
+            cd = src[source + 1] & 0xF7DEF7DE;
+            ef = src[source + 2] & 0xF7DEF7DE;
+            gh = src[source + 3] & 0xF7DEF7DE;
+            ij = src[source + 4] & 0xF7DEF7DE;
+            kl = src[source + 5] & 0xF7DEF7DE;
+            mn = src[source + 6] & 0xF7DEF7DE;
+            op = src[source + 7] & 0xF7DEF7DE;
+
+            if(Eh >= midh) {
+                ab = AVERAGE(ab, src[source + 256/2]) & 0xF7DEF7DE;
+                cd = AVERAGE(cd, src[source + 256/2 + 1]) & 0xF7DEF7DE;
+                ef = AVERAGE(ef, src[source + 256/2 + 2]) & 0xF7DEF7DE;
+                gh = AVERAGE(gh, src[source + 256/2 + 3]) & 0xF7DEF7DE;
+                ij = AVERAGE(ij, src[source + 256/2 + 4]) & 0xF7DEF7DE;
+                kl = AVERAGE(kl, src[source + 256/2 + 5]) & 0xF7DEF7DE;
+                mn = AVERAGE(mn, src[source + 256/2 + 6]) & 0xF7DEF7DE;
+                op = AVERAGE(op, src[source + 256/2 + 7]) & 0xF7DEF7DE;
+            }
+
+            *dst++ = (ab & 0xFFFF) + (ab << 16);            // [aa]
+            *dst++ = (ab >> 16) + (ab & 0xFFFF0000);        // [bb]
+            *dst++ = (cd & 0xFFFF) + (cd << 16);            // [cc]
+            *dst++ = (cd >> 16) + (((cd & 0xF7DE0000) >> 1) + ((ef & 0xF7DE) << 15)); // [d(de)]
+            *dst++ = ef;                                    // [ef]
+            *dst++ = (ef >> 16) + (gh << 16);               // [fg]
+            *dst++ = gh;                                    // [gh]
+            *dst++ = (gh >> 16) + (ij << 16);               // [hi]
+            *dst++ = ij;                                    // [ij]
+            *dst++ = (ij >> 16) + (kl << 16);               // [jk]
+            *dst++ = kl;                                    // [kl]
+            *dst++ = (((kl & 0xF7DE0000) >> 17) + ((mn & 0xF7DE) >> 1)) + (mn << 16); // [(lm)m]
+            *dst++ = (mn >> 16) + (mn & 0xFFFF0000);        // [nn]
+            *dst++ = (op & 0xFFFF) + (op << 16);            // [oo]
+            *dst++ = (op >> 16) + (op & 0xFFFF0000);        // [pp]
+
+            source += 8;
+        }
+        Eh += 192; if(Eh >= 272) { Eh -= 272; dh++; }
+    }
+}
+
 #if 0
 /* Bresenham's upscale routine - SLOW!!! */
 void UpscaleBresenham(uint16_t *dst, 
@@ -540,12 +639,6 @@ void UpscaleBresenham(uint16_t *dst,
         dst += dst_pitch-dst_w;
         Eh += src_h; if(Eh >= dst_h) { Eh -= dst_h; dh++; }
     }
-}
-
-void upscale_256x192_to_480x272(uint32_t *dst, uint32_t *src)
-{
-    // left 8 pixels are not shown, so clip them
-    UpscaleBresenham((uint16_t *)dst, 480*2, 480, 272, (uint16_t *)src+8, 256*2, 256-8, 192);
 }
 
 void upscale_256x192_to_400x240(uint32_t *dst, uint32_t *src)
