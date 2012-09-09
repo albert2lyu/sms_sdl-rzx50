@@ -10,7 +10,7 @@
 # USE_ZLIB  : enable ZIP file support
 
 NAME	  = sms_sdl.dge
-CC        = mipsel-linux-uclibc-gcc
+CC        = mipsel-linux-gcc
 CFLAGS    = -O3 -march=mips32 -mtune=r4600 -fomit-frame-pointer -ffast-math -msoft-float
 DEFINES   = -DLSB_FIRST -DALIGN_DWORD
 INCLUDES  = -I. -Ibase -Icpu -Isound
