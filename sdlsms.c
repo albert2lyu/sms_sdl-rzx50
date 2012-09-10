@@ -82,7 +82,7 @@ void fsync(FILE *fd) { }
 
 static int readvolume()
 {
-#ifndef WIN32
+#if 0 //ndef WIN32
     char *mixer_device = "/dev/mixer";
     int mixer;
     int basevolume = 50;
@@ -99,7 +99,7 @@ static int readvolume()
 
 static void setvolume(int involume)
 {
-#ifndef WIN32
+#if 0 //ndef WIN32
     char *mixer_device = "/dev/mixer";
     int mixer;
     int newvolume = involume;
@@ -313,21 +313,21 @@ void menu()
         dstRect.y = 30;
         SDL_BlitSurface(miniscreen,NULL,sdl_video.surf_screen,&dstRect);
 
-        gfx_font_print_center(sdl_video.surf_screen,5,bigfontwhite,"DINGUX SMS_SDL");
+        gfx_font_print_center(sdl_video.surf_screen,5,bigfontwhite,"DINGUX SMS_SDL 0.9.4aR7.1");
 
         if (currentselection == 1)
             gfx_font_print(sdl_video.surf_screen,5,25,bigfontred,"Continue");
         else
             gfx_font_print(sdl_video.surf_screen,5,25,bigfontwhite,"Continue");
 
-
+/*
         sprintf(text,"Volume %d",volume);
 
         if (currentselection == 2)
             gfx_font_print(sdl_video.surf_screen,5,45,bigfontred,text);
         else
             gfx_font_print(sdl_video.surf_screen,5,45,bigfontwhite,text);
-
+*/
         sprintf(text,"Save State %d",sdl_controls.state_slot);
 
         if (currentselection == 3)
@@ -376,7 +376,8 @@ void menu()
         else
             gfx_font_print(sdl_video.surf_screen,5,145,bigfontwhite,"Quit");
 
-        gfx_font_print_center(sdl_video.surf_screen,sdl_video.surf_screen->h-40-gfx_font_height(font),font,"Dingux sms_sdl has been ported by joyrider");
+        gfx_font_print_center(sdl_video.surf_screen,sdl_video.surf_screen->h-50-gfx_font_height(font),font,"Dingux Sms+Sdl for Ritmix rzx50 and Dingoo a380");
+        gfx_font_print_center(sdl_video.surf_screen,sdl_video.surf_screen->h-40-gfx_font_height(font),font,"by exmortis@yandex.ru, original port by joyrider");
         gfx_font_print_center(sdl_video.surf_screen,sdl_video.surf_screen->h-30-gfx_font_height(font),font,"Thanks to alekmaul for the scaler example,");
         gfx_font_print_center(sdl_video.surf_screen,sdl_video.surf_screen->h-20-gfx_font_height(font),font,"Harteex for the tga loading and bin2h,");
         gfx_font_print_center(sdl_video.surf_screen,sdl_video.surf_screen->h-10-gfx_font_height(font),font,"everyone on #dingoo-a320 and #dingoonity!");
@@ -389,11 +390,13 @@ void menu()
                 {
                     case SDLK_UP:
                         currentselection--;
+                        if(currentselection == 2) currentselection--;
                         if (currentselection == 0)
                             currentselection = 7;
                         break;
                     case SDLK_DOWN:
                         currentselection++;
+                        if(currentselection == 2) currentselection++;
                         if (currentselection == 8)
                             currentselection = 1;
                         break;
