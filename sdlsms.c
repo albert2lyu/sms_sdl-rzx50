@@ -593,7 +593,7 @@ static int sdlsms_video_init(int frameskip, int afullscreen, int filter)
     Uint32 vidflagsvidflags = SDL_SWSURFACE;
     FILE *f;
     int vol;
-    Uint32 vidflags = SDL_SWSURFACE;
+    Uint32 vidflags = SDL_HWSURFACE;
   
     screen_width  = (IS_GG) ? GG_SCREEN_WIDTH  : SMS_SCREEN_WIDTH;
     screen_height = (IS_GG) ? GG_SCREEN_HEIGHT : SMS_SCREEN_HEIGHT;
@@ -716,7 +716,7 @@ static void sdlsms_video_finish_update()
     else { */
         //sdlsms_video_blit_center(sdl_video.surf_screen, sdl_video.surf_bitmap);
         SDL_LockSurface(sdl_video.surf_screen);
-        SDL_LockSurface(sdl_video.surf_bitmap);
+        //SDL_LockSurface(sdl_video.surf_bitmap);
         switch(fullscreen) {
         case 1: // normal fullscreen
             switch(sdl_video.surf_screen->w) {
@@ -770,7 +770,7 @@ static void sdlsms_video_finish_update()
             break;
         }
 
-        SDL_UnlockSurface(sdl_video.surf_bitmap);
+        //SDL_UnlockSurface(sdl_video.surf_bitmap);
         SDL_UnlockSurface(sdl_video.surf_screen);
         if(showfps) {
             sprintf(buf,"%d fps",fps);
