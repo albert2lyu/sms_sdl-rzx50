@@ -11,10 +11,10 @@
 
 NAME	  = sms_sdl.dge
 CC        = mipsel-linux-gcc
-CFLAGS    = -O3 -march=mips32 -mtune=r4600 -fomit-frame-pointer -ffast-math -msoft-float
+CFLAGS    = -O3 -march=mips32 -mtune=r4600 -fomit-frame-pointer -ffast-math
 DEFINES   = -DLSB_FIRST -DALIGN_DWORD
 INCLUDES  = -I. -Ibase -Icpu -Isound
-LIBS	  = -s -lSDL -lz
+LIBS	  = -s -lSDL -lz -lm
 
 OBJECTS   = main.o saves.o sdlsms.o \
             base/render.o base/sms.o base/system.o base/vdp.o \
